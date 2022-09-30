@@ -14,7 +14,7 @@ entity processorRV is
    port(
       Clk      : in  std_logic;                     -- Reloj activo en flanco subida
       Reset    : in  std_logic;                     -- Reset asincrono activo nivel alto
-      -- Instruction memory
+      -- InstructionIF memory
       IAddr    : out std_logic_vector(31 downto 0); -- Direccion Instr
       IDataIn  : in  std_logic_vector(31 downto 0); -- Instruccion leida
       -- Data memory
@@ -93,120 +93,163 @@ architecture rtl of processorRV is
     );
   end component Imm_Gen;
 
-  signal Alu_Op1      : std_logic_vector(31 downto 0);
-  signal Alu_Op2      : std_logic_vector(31 downto 0);
-  signal Alu_ZERO     : std_logic;
-  signal Alu_SIGN      : std_logic;
-  signal AluControl   : std_logic_vector(3 downto 0);
-  signal reg_RD_data  : std_logic_vector(31 downto 0);
 
-  signal branch_true : std_logic;
-  signal PC_next        : std_logic_vector(31 downto 0);
-  signal PC_reg         : std_logic_vector(31 downto 0);
-  signal PC_plus4       : std_logic_vector(31 downto 0);
+  --Señales IF
 
-  signal Instruction    : std_logic_vector(31 downto 0); -- La instrucción desde lamem de instr
-  signal Inm_ext        : std_logic_vector(31 downto 0); -- La parte baja de la instrucción extendida de signo
-  signal reg_RS, reg_RT : std_logic_vector(31 downto 0);
+  signal branch_true      : std_logic;
+  signal PC_nextIF        : std_logic_vector(31 downto 0);
+  signal PC_regIF         : std_logic_vector(31 downto 0);
+  signal PC_plus4IF       : std_logic_vector(31 downto 0);
 
-  signal dataIn_Mem     : std_logic_vector(31 downto 0); -- From Data Memory
-  signal Addr_Branch    : std_logic_vector(31 downto 0);
+  signal InstrucctionIF   : std_logic_vector(31 downto 0); -- La instrucción desde lamem de instr
 
-  signal Ctrl_Jalr, Ctrl_Branch, Ctrl_MemWrite, Ctrl_MemRead,  Ctrl_ALUSrc, Ctrl_RegWrite : std_logic;
-  
-  --Ctrl_RegDest,
-  signal Ctrl_ALUOP     : std_logic_vector(2 downto 0);
-  signal Ctrl_PcLui     : std_logic_vector(1 downto 0);
-  signal Ctrl_ResSrc    : std_logic_vector(1 downto 0);
 
-  --Señales salida registro IF/ID
+  --Señales IF/ID
 
-  signal i_ID           : std_logic_vector(31 downto 0);
-  signal pc_ID          : std_logic_vector(31 downto 0);
+  signal PC_regIFID       : std_logic_vector(31 downto 0);
+  signal InstrucctionIFID : std_logic_vector(31 downto 0);
+
+
+  --Señales ID
+
+  signal Ctrl_JarlID      : std_logic;
+  signal Ctrl_BranchID    : std_logic;
+  signal Ctrl_MemWriteID  : std_logic;
+  signal Ctrl_MemReadID   : std_logic;
+  signal Ctrl_ALUSrcID    : std_logic;
+  signal Ctrl_RegWriteID  : std_logic;
+
+  signal Ctrl_ALUOPID     : std_logic_vector(2 downto 0);
+  signal Ctrl_PcLuiID     : std_logic_vector(1 downto 0);
+  signal Ctrl_ResSrcID    : std_logic_vector(1 downto 0);  --MemtoReg
+
+  signal Inm_extID        : std_logic_vector(31 downto 0); -- La parte baja de la instrucción extendida de signo
+
+  signal reg_RSID         : std_logic_vector(31 downto 0); --Read data 1
+  signal reg_RTID         : std_logic_vector(31 downto 0); --Read data 2
+
+  -- Instruction fields (Generadas en ID)
+  signal Funct3ID         : std_logic_vector(2 downto 0);
+  signal Funct7ID         : std_logic_vector(6 downto 0);
+  signal RDID             : std_logic_vector(4 downto 0);
+
+  --Señales ID/EX
+
+  signal PC_regIDEX         : std_logic_vector(31 downto 0);
+
+  signal Ctrl_JarlIDEX      : std_logic;
+  signal Ctrl_BranchIDEX    : std_logic;
+  signal Ctrl_MemWriteIDEX  : std_logic;
+  signal Ctrl_MemReadIDEX   : std_logic;
+  signal Ctrl_ALUSrcIDEX    : std_logic;
+  signal Ctrl_RegWriteIDEX  : std_logic;
+
+  signal Ctrl_ALUOPIDEX     : std_logic_vector(2 downto 0);
+  signal Ctrl_PcLuiIDEX     : std_logic_vector(1 downto 0);
+  signal Ctrl_ResSrcIDEX    : std_logic_vector(1 downto 0);  --MemtoReg
+
+  signal Inm_extIDEX        : std_logic_vector(31 downto 0);
+
+  signal reg_RSIDEX         : std_logic_vector(31 downto 0); --Read data 1
+  signal reg_RTIDEX         : std_logic_vector(31 downto 0); --Read data 2
+
+  signal Funct3IDEX         : std_logic_vector(2 downto 0);
+  signal Funct7IDEX         : std_logic_vector(6 downto 0);
+
+  signal RDIDEX             : std_logic_vector(4 downto 0);
 
   --Señales EX
 
-  signal ResultSrc_EX :  std_logic_vector(1 downto 0); -- [1,0]
-  signal      RegWrite_EX : std_logic;
-  signal    Branch_EX : std_logic;
-  signal     MemRead_EX : std_logic;
-  signal     MemWrite_EX :std_logic;
-  signal      ALUSrc_Ex :std_logic;
-  signal     AuipcLui_EX :std_logic_vector(1 downto 0);    --[1,0]
-  signal     ALUOP_EX :std_logic_vector(2 downto 0);       --[2,0]
-  signal      Ins_jalr_EX :std_logic;
-  signal      pc_EX :std_logic_vector(31 downto 0);
-  signal     reg_RS_EX :std_logic_vector(31 downto 0);
-  signal      reg_RT_EX :std_logic_vector(31 downto 0);
-  signal     inm_EX :std_logic_vector(31 downto 0);
-  signal     funct3_EX : std_logic_vector(2 downto 0);
-  signal     funct7_EX : std_logic_vector(6 downto 0);
-  signal      RD_EX :  std_logic_vector(4 downto 0);
+  signal Addr_BranchEX    : std_logic_vector(31 downto 0);
+  signal Addr_jalrEX      : std_logic_vector(31 downto 0);
 
+  signal AluControlEX     : std_logic_vector(3 downto 0);
+  signal Alu_Op1EX        : std_logic_vector(31 downto 0);
+  signal Alu_Op2EX        : std_logic_vector(31 downto 0);
+  signal Alu_ResEX        : std_logic_vector(31 downto 0);
+  signal Alu_SIGNEX       : std_logic;
+  signal Alu_ZEROEX       : std_logic;
 
-  signal Addr_jalr      : std_logic_vector(31 downto 0);
-  signal Addr_Jump_dest : std_logic_vector(31 downto 0);
-  signal desition_Jump  : std_logic;
-  signal Alu_Res        : std_logic_vector(31 downto 0);
-  -- Instruction filds
-  signal Funct3         : std_logic_vector(2 downto 0);
-  signal Funct7         : std_logic_vector(6 downto 0);
-  signal RS1, RS2, RD   : std_logic_vector(4 downto 0);
+  --Señales EX/MEM
 
+  signal Ctrl_MemWriteEXMEM  : std_logic;
+  signal Ctrl_MemReadEXMEM   : std_logic;
+  signal Ctrl_RegWriteEXMEM  : std_logic;
+  signal Ctrl_ResSrcEXMEM    : std_logic_vector(1 downto 0);  --MemtoReg
+
+  signal reg_RTEXMEM         : std_logic_vector(31 downto 0); --Read data 2
+  signal RDEXMEM             : std_logic_vector(4 downto 0);
+
+  signal Alu_ResEXMEM        : std_logic_vector(31 downto 0);
+  signal Alu_ZEROEXMEM       : std_logic;
+
+  signal Funct3EXMEM         : std_logic_vector(2 downto 0);
+
+  --Señales MEM
+
+  signal Addr_Jump_destMEM  : std_logic_vector(31 downto 0);
+  signal dataIn_MemMEM      : std_logic_vector(31 downto 0); -- From Data Memory
+  signal desition_JumpMEM   : std_logic;
+
+  --Señales MEM/WB
+
+  signal Ctrl_RegWriteMEMWB  : std_logic;
+  signal Ctrl_ResSrcMEMWB    : std_logic_vector(1 downto 0);  --MemtoReg
+
+  signal Alu_ResMEMWB        : std_logic_vector(31 downto 0);
+  signal RDMEMWB             : std_logic_vector(4 downto 0);
+
+  signal dataIn_MemMEMWB     : std_logic_vector(31 downto 0); -- From Data Memory
+
+  --Señales WB
+  
+  signal reg_RD_dataWB  : std_logic_vector(31 downto 0);
 
 begin
 
-  PC_next <= Addr_Jump_dest when desition_Jump = '1' else PC_plus4;
+  -- Multiplexor IF --------------------------------------------------------
+  PC_next <= Addr_Jump_destMEM when desition_JumpMEM = '1' else PC_plus4IF;
+  --------------------------------------------------------------------------
 
-  -- Program Counter
+  ---------------------------------------------------
+  -- PC REGISTER PROCESS
+  ---------------------------------------------------
   PC_reg_proc: process(Clk, Reset)
   begin
     if Reset = '1' then
-      PC_reg <= (22 => '1', others => '0'); -- 0040_0000
+      PC_regIF <= (22 => '1', others => '0'); -- 0040_0000
     elsif rising_edge(Clk) then
-      PC_reg <= PC_next;
+      PC_regIF <= PC_nextIF;
     end if;
   end process;
 
-  PC_plus4    <= PC_reg + 4;
-  IAddr       <= PC_reg;
-  Instruction <= IDataIn;
-  Funct3      <= i_ID(14 downto 12); -- Campo "funct3" de la instruccion
-  Funct7      <= i_ID(31 downto 25); -- Campo "funct7" de la instruccion
-  RD          <= i_ID(11 downto 7);
-  RS1         <= i_ID(19 downto 15);
-  RS2         <= i_ID(24 downto 20);
+  -- ADD IF ---------------------
+  PC_plus4IF    <= PC_regIF + 4;
+  -------------------------------
 
+  -- INSTRUCTION MEMORY -----
+  IAddr         <= PC_regIF;
+  InstructionIF <= IDataIn;
+  ---------------------------
 
-    -- Register IF/ID
-    IF_ID_REG: process(Clk, Reset)
-    begin
-      if Reset = '1' then
-        pc_ID <= (others => '0');
-        i_ID <= (others => '0');
-      elsif rising_edge(Clk) then
-        pc_ID <= PC_reg;
-        i_ID <= Instruction;
-      end if;
-    end process;
+  ---------------------------------------------------
+  -- IFID PROCESS
+  ---------------------------------------------------
+  IF_ID_REG: process(Clk, Reset)
+  begin
+    if Reset = '1' then
+      PC_regIFID      <= (others => '0');
+      InstructionIFID <= (others => '0');
+    elsif rising_edge(Clk) then
+      PC_regIFID      <= PC_regIF;
+      InstructionIFID <= InstructionIF;
+    end if;
+  end process;
 
-
-  RegsRISCV : reg_bank
-  port map (
-    Clk   => Clk,
-    Reset => Reset,
-    A1    => RS1, --Instruction(19 downto 15), --rs1
-    Rd1   => reg_RS,
-    A2    => RS2, --Instruction(24 downto 20), --rs2
-    Rd2   => reg_RT,
-    A3    => RD, --Instruction(11 downto 7),,
-    Wd3   => reg_RD_data,
-    We3   => Ctrl_RegWrite
-  );
 
   UnidadControl : control_unit
   port map(
-    OpCode   => Instruction(6 downto 0),
+    OpCode   => InstructionIFID(6 downto 0),
     -- Señales para el PC
     --Jump   => CONTROL_JUMP,
     Branch   => Ctrl_Branch,
@@ -224,102 +267,196 @@ begin
     RegWrite => Ctrl_RegWrite
   );
 
-
-  -- Register ID/EX
-  ID_EX_REG: process(Clk, Reset)
-  begin
-    if Reset = '1' then
-      ResultSrc_EX <= (others => '0');   -- [1,0]
-      RegWrite_EX <= '0';
-      Branch_EX <= '0';
-      MemRead_EX <= '0';
-      MemWrite_EX <= '0';
-      ALUSrc_Ex <= '0';
-      AuipcLui_EX <= (others => '0');    --[1,0]
-      ALUOP_EX <= (others => '0');       --[2,0]
-      --Ins_jalr_EX <= '0';
-      pc_EX <= (others => '0');
-      reg_RS_EX <= (others => '0');
-      reg_RT_EX <= (others => '0');
-      inm_EX <= (others => '0');
-      funct3_EX <= (others => '0');
-      funct7_EX <= (others => '0');
-      RD_EX <= (others => '0');
-    elsif rising_edge(Clk) then
-      ResultSrc_EX <= Ctrl_ResSrc;   -- [1,0]
-      RegWrite_EX <= Ctrl_RegWrite;
-      Branch_EX <= Ctrl_Branch;
-      MemRead_EX <= Ctrl_MemRead;
-      MemWrite_EX <= Ctrl_MemWrite;
-      ALUSrc_Ex <= Ctrl_ALUSrc;
-      AuipcLui_EX <= Ctrl_PcLui;    --[1,0]
-      ALUOP_EX <= Ctrl_ALUOP;       --[2,0]
-    --  Ins_jalr_EX <= Ctrl_jalr;
-      pc_EX <= pc_ID;               --[31,0]
-      reg_RS_EX <= reg_RS;          --[31,0]
-      reg_RT_EX <= reg_RT;          --[31,0]
-      inm_EX <= Inm_ext;            --[31,0]
-      funct3_EX <= Funct3;        
-      funct7_EX <= funct7;
-      RD_EX <= RD;
-    end if;
-  end process;
+  RegsRISCV : reg_bank
+  port map (
+    Clk   => Clk,
+    Reset => Reset,
+    A1    => Instruction(19 downto 15), --rs1
+    Rd1   => reg_RS,
+    A2    => Instruction(24 downto 20), --rs2
+    Rd2   => reg_RT,
+    A3    => RD, --Instruction(11 downto 7),,
+    Wd3   => reg_RD_dataWB,
+    We3   => Ctrl_RegWrite
+  );
 
   inmed_op : Imm_Gen
   port map (
-        instr    => Instruction,
-        imm      => Inm_ext 
+        instr    => InstrucctionIFID,
+        imm      => Inm_extID 
+  );
+  
+  -- DIVISION DEL CAMPO INSTRUCTION  -------------------------------------------------
+  Funct3ID      <= InstructionIFID(14 downto 12); -- Campo "funct3" de la instruccion
+  Funct7ID      <= InstructionIFID(31 downto 25); -- Campo "funct7" de la instruccion
+  RDID          <= InstructionIFID(11 downto 7);
+  ------------------------------------------------------------------------------------
+
+  ---------------------------------------------------
+  -- IDEX PROCESS
+  ---------------------------------------------------
+  IDEX_process: process(Clk, Reset)
+  begin
+    if Reset = '1' then
+      Ctrl_ALUSrcIDEX     <= '0';
+      Ctrl_BranchIDEX     <= '0';
+      Ctrl_JarlIDEX       <= '0';
+      Ctrl_MemReadIDEX    <= '0';
+      Ctrl_MemToRegIDEX   <= '0';
+      Ctrl_MemWriteIDEX   <= '0';
+      Ctrl_RegDestIDEX    <= '0';
+      Ctrl_RegWriteIDEX   <= '0';
+      Ctrl_ALUOPIDEX      <= (others => '0');
+      Ctrl_PcLuiIDEX      <= (others => '0');
+      Funct3IDEX          <= (others => '0');
+      Funct7IDEX          <= (others => '0');
+      Inm_extIDEX         <= (others => '0');
+      PC_regIDEX          <= (others => '0');
+      RDIDEX              <= (others => '0');
+      reg_RSIDEX          <= (others => '0');
+      reg_RTIDEX          <= (others => '0');
+    elsif rising_edge(Clk) then
+      Ctrl_ALUSrcIDEX     <= Ctrl_ALUSrcID;
+      Ctrl_BranchIDEX     <= Ctrl_BranchID;
+      Ctrl_JarlIDEX       <= Ctrl_JarlID;
+      Ctrl_MemReadIDEX    <= Ctrl_MemReadID;
+      Ctrl_MemToRegIDEX   <= Ctrl_MemToRegID;
+      Ctrl_MemWriteIDEX   <= Ctrl_MemWriteID;
+      Ctrl_RegDestIDEX    <= Ctrl_RegDestID;
+      Ctrl_RegWriteIDEX   <= Ctrl_RegWriteID;
+      Ctrl_ALUOPIDEX      <= Ctrl_ALUOPID;
+      Ctrl_PcLuiIDEX      <= Ctrl_PcLuiID;
+      Funct3IDEX          <= Funct3ID;
+      Funct7IDEX          <= Funct7ID;
+      Inm_extIDEX         <= Inm_extID;
+      PC_regIDEX          <= PC_regID;
+      RDIDEX              <= RDID;
+      reg_RSIDEX          <= reg_RSID;
+      reg_RTIDEX          <= reg_RTID;
+    end if;
+  end process;
+
+  -- ADD EX ---------------------------------------------------------
+  Addr_BranchEX    <= PC_regIDEX + (Inm_extIDEX(30 downto 0) & '0'); -- Se realiza el Shift left 1
+  Addr_jalrEX      <= reg_RSIDEX + Inm_extIDEX;
+  -------------------------------------------------------------------
+
+  Alu_RISCV : alu_RV
+  port map (
+    OpA      => Alu_Op1EX,
+    OpB      => Alu_Op2EX,
+    Control  => AluControlEX,
+    Result   => Alu_ResEX,
+    Signflag => Alu_SIGNEX,
+    carryOut => open,
+    Zflag    => Alu_ZEROEX
   );
 
-  Addr_Branch    <= PC_reg + Inm_ext;
-  Addr_jalr      <= reg_RS + Inm_ext;
+  -- Multiplexor EX1 --------------------------------------------
+  Alu_Op1EX    <= PC_regIDEX     when Ctrl_PcLuiIDEX = "00" else
+                (others => '0')  when Ctrl_PcLuiIDEX = "01" else
+                reg_RSIDEX; -- any other
+  ---------------------------------------------------------------
 
-  desition_Jump  <= Ctrl_Jalr or (Ctrl_Branch and branch_true);
-  branch_true    <= '1' when ( ((Funct3 = BR_F3_BEQ) and (Alu_ZERO = '1')) or
-                               ((Funct3 = BR_F3_BNE) and (Alu_ZERO = '0')) or
-                               ((Funct3 = BR_F3_BLT) and (Alu_SIGN = '1')) or
-                               ((Funct3 = BR_F3_BGT) and (Alu_SIGN = '0')) ) else
-                    '0';
- 
-  Addr_Jump_dest <= Addr_jalr   when Ctrl_jalr = '1' else
-                    Addr_Branch when Ctrl_Branch='1' else
-                    (others =>'0');
+  -- Multiplexor EX2 -----------------------------------------------------
+  Alu_Op2EX    <= reg_RTIDEX when Ctrl_ALUSrcIDEX = '0' else Inm_extIDEX;
+  ------------------------------------------------------------------------
 
   Alu_control_i: alu_control
   port map(
     -- Entradas:
-    ALUOp  => Ctrl_ALUOP, -- Codigo de control desde la unidad de control
-    Funct3  => Funct3,    -- Campo "funct3" de la instruccion
-    Funct7  => Funct7,    -- Campo "funct7" de la instruccion
+    ALUOp  => Ctrl_ALUOPIDEX, -- Codigo de control desde la unidad de control
+    Funct3  => Funct3IDEX,    -- Campo "funct3" de la instruccion
+    Funct7  => Funct7IDEX,    -- Campo "funct7" de la instruccion
     -- Salida de control para la ALU:
-    ALUControl => AluControl -- Define operacion a ejecutar por la ALU
+    ALUControl => AluControlEX -- Define operacion a ejecutar por la ALU
   );
 
-  Alu_RISCV : alu_RV
-  port map (
-    OpA      => Alu_Op1,
-    OpB      => Alu_Op2,
-    Control  => AluControl,
-    Result   => Alu_Res,
-    Signflag => Alu_SIGN,
-    carryOut => open,
-    Zflag    => Alu_ZERO
-  );
 
-  Alu_Op1    <= PC_reg           when Ctrl_PcLui = "00" else
-                (others => '0')  when Ctrl_PcLui = "01" else
-                reg_RS; -- any other 
-  Alu_Op2    <= reg_RT when Ctrl_ALUSrc = '0' else Inm_ext;
+  ---------------------------------------------------
+  -- EXMEM PROCESS
+  ---------------------------------------------------
+  EXMEM_process: process(Clk, Reset)
+  begin
+    if Reset = '1' then
+      Alu_SIGNEXMEM       <= '0';
+      Alu_ZEROEXMEM       <= '0';
+      Ctrl_BranchEXMEM    <= '0';
+      Ctrl_JumpEXMEM      <= '0';
+      Ctrl_MemReadEXMEM   <= '0';
+      Ctrl_MemToRegEXMEM  <= '0';
+      Ctrl_MemWriteEXMEM  <= '0';
+      Ctrl_RegWriteEXMEM  <= '0';
+      Addr_BranchEXMEM    <= (others => '0');
+      Addr_JalrEXMEM      <= (others => '0');
+      Alu_ResEXMEM        <= (others => '0');
+      Funct3EXMEM         <= (others => '0');
+      RDEXMEM             <= (others => '0');
+      reg_RTEXMEM         <= (others => '0');
+    elsif rising_edge(Clk) then
+      Alu_SIGNEXMEM       <= Alu_SIGNEX;
+      Alu_ZEROEXMEM       <= Alu_ZEROEX;
+      Ctrl_BranchEXMEM    <= Ctrl_BranchIDEX;
+      Ctrl_JalrEXMEM      <= Ctrl_JalrIDEX;
+      Ctrl_MemReadEXMEM   <= Ctrl_MemReadIDEX;
+      Ctrl_MemToRegEXMEM  <= Ctrl_MemToRegIDEX;
+      Ctrl_MemWriteEXMEM  <= Ctrl_MemWriteIDEX;
+      Ctrl_RegWriteEXMEM  <= Ctrl_RegWriteIDEX;
+      Addr_BranchEXMEM    <= Addr_BranchEX;
+      Addr_JalrEXMEM      <= Addr_JalrEX;
+      Alu_ResEXMEM        <= Alu_ResEX;
+      Funct3EXMEM         <= Funct3IDEX;
+      RDEXMEM             <= RDEX;
+      reg_RTEXMEM         <= reg_RTIDEX;
+    end if;
+  end process;
+
+  -- Operaciones de Jump y Branch -----------------------------------------------------------
+  desition_JumpMEM  <= Ctrl_JalrEXMEM or (Ctrl_BranchEXMEM and branch_true);
+  branch_true    <= '1' when ( ((Funct3EXMEM = BR_F3_BEQ) and (Alu_ZEROEXMEM = '1')) or
+                               ((Funct3EXMEM = BR_F3_BNE) and (Alu_ZEROEXMEM = '0')) or
+                               ((Funct3EXMEM = BR_F3_BLT) and (Alu_SIGNEXMEM = '1')) or
+                               ((Funct3EXMEM = BR_F3_BGT) and (Alu_SIGNEXMEM = '0')) ) else
+                    '0';
+ 
+  Addr_Jump_destMEM <= Addr_JalrEXMEM   when Ctrl_JalrEXMEM = '1' else
+                    Addr_BranchEXMEM when Ctrl_BranchEXMEM='1' else
+                    (others =>'0');
+  -------------------------------------------------------------------------------------------
 
 
-  DAddr      <= Alu_Res;
-  DDataOut   <= reg_RT;
-  DWrEn      <= Ctrl_MemWrite;
-  dRdEn      <= Ctrl_MemRead;
-  dataIn_Mem <= DDataIn;
+  ---------------------------------------------------
+  -- MEMWB PROCESS
+  ---------------------------------------------------
+  MEMWB_process: process(Clk, Reset)
+  begin
+    if Reset = '1' then
+      Ctrl_MemToRegMEMWB  <= '0';
+      Ctrl_RegWriteMEMWB  <= '0';
+      Alu_ResMEMWB        <= (others => '0');
+      dataIn_MemMEMWB     <= (others => '0');
+      reg_RDMEMWB         <= (others => '0');
+    elsif rising_edge(Clk) then
+      Ctrl_MemToRegMEMWB  <= Ctrl_MemToRegEXMEM;
+      Ctrl_RegWriteMEMWB  <= Ctrl_RegWriteEXMEM;
+      Alu_ResMEMWB        <= Alu_ResEXMEM;
+      dataIn_MemMEMWB     <= dataIn_MemMEM;
+      reg_RDMEMWB         <= reg_RDEXMEM;
+    end if;
+  end process;
 
-  reg_RD_data <= dataIn_Mem when Ctrl_ResSrc = "01" else
-                 PC_plus4   when Ctrl_ResSrc = "10" else 
-                 Alu_Res; -- When 00
+  -- DATA MEMORY ----------------------
+  DAddr         <= Alu_ResEXMEM;
+  DDataOut      <= reg_RTEXMEM;
+  DWrEn         <= Ctrl_MemWriteEXMEM;
+  dRdEn         <= Ctrl_MemReadEXMEM;
+  dataIn_MemMEM <= DDataIn;
+  -------------------------------------
+
+  -- Multiplexor WB --------------------------------------------
+  reg_RD_dataWB <= dataIn_Mem when Ctrl_ResSrcMEMWB = "01" else
+                 PC_plus4IF   when Ctrl_ResSrcMEMWB = "10" else 
+                 Alu_ResMEMWB; -- When 00
+  --------------------------------------------------------------
 
 end architecture;
