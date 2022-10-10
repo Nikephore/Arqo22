@@ -281,7 +281,7 @@ begin
     Rd1   => reg_RSID,
     A2    => InstructionIFID(24 downto 20), --rs2
     Rd2   => reg_RTID,
-    A3    => RD_MEMWB, --Instruction(11 downto 7),,
+    A3    => RD_MEMWB, 
     Wd3   => reg_RD_dataWB,
     We3   => Ctrl_RegWriteMEMWB
   );
@@ -295,7 +295,7 @@ begin
   -- DIVISION DEL CAMPO INSTRUCTION  -------------------------------------------------
   Funct3ID      <= InstructionIFID(14 downto 12); -- Campo "funct3" de la instruccion
   Funct7ID      <= InstructionIFID(31 downto 25); -- Campo "funct7" de la instruccion
-  RDID          <= InstructionIFID(11 downto 7);
+  RD_ID          <= InstructionIFID(11 downto 7);
   ------------------------------------------------------------------------------------
 
   ---------------------------------------------------
@@ -317,7 +317,7 @@ begin
       Funct7IDEX          <= (others => '0');
       Inm_extIDEX         <= (others => '0');
       PC_regIDEX          <= (others => '0');
-      RDIDEX              <= (others => '0');
+      RD_IDEX              <= (others => '0');
       reg_RSIDEX          <= (others => '0');
       reg_RTIDEX          <= (others => '0');
     elsif rising_edge(Clk) then
@@ -334,7 +334,7 @@ begin
       Funct7IDEX          <= Funct7ID;
       Inm_extIDEX         <= Inm_extID;
       PC_regIDEX          <= PC_regIFID;
-      RDIDEX              <= RDID;
+      RD_IDEX              <= RD_ID;
       reg_RSIDEX          <= reg_RSID;
       reg_RTIDEX          <= reg_RTID;
     end if;
@@ -395,7 +395,7 @@ begin
       Addr_JalrEXMEM      <= (others => '0');
       Alu_ResEXMEM        <= (others => '0');
       Funct3EXMEM         <= (others => '0');
-      RDEXMEM             <= (others => '0');
+      RD_EXMEM             <= (others => '0');
       reg_RTEXMEM         <= (others => '0');
     elsif rising_edge(Clk) then
       Alu_SIGNEXMEM       <= Alu_SIGNEX;
@@ -410,7 +410,7 @@ begin
       Addr_JalrEXMEM      <= Addr_JalrEX;
       Alu_ResEXMEM        <= Alu_ResEX;
       Funct3EXMEM         <= Funct3IDEX;
-      RDEXMEM             <= RDIDEX;
+      RD_EXMEM             <= RD_IDEX;
       reg_RTEXMEM         <= reg_RTIDEX;
     end if;
   end process;
@@ -439,13 +439,13 @@ begin
       Ctrl_ResSrcMEMWB    <= (others => '0');
       Alu_ResMEMWB        <= (others => '0');
       dataIn_MemMEMWB     <= (others => '0');
-      RDMEMWB             <= (others => '0');
+      RD_MEMWB             <= (others => '0');
     elsif rising_edge(Clk) then
       Ctrl_RegWriteMEMWB  <= Ctrl_RegWriteEXMEM;
       Ctrl_ResSrcMEMWB    <= Ctrl_ResSrcEXMEM; --MemtoReg
       Alu_ResMEMWB        <= Alu_ResEXMEM;
       dataIn_MemMEMWB     <= dataIn_MemMEM;
-      RDMEMWB             <= RDEXMEM;
+      RD_MEMWB             <= RD_EXMEM;
     end if;
   end process;
 
