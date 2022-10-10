@@ -35,7 +35,7 @@ begin
   subExt <= (OpA(31) & OpA) - (OpB(31) & OpB);
   addExt <= (OpA(31) & OpA) + (OpB(31) & OpB);
 
-  process (Control, OpA, OpB, subExt)
+  process (Control, OpA, OpB, subExt, addExt)
   begin
     case Control is
        when ALU_OR  => sigResult <= OpA or OpB;
