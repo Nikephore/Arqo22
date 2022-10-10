@@ -9,9 +9,10 @@ add wave -noupdate /processorrv_tb/dRdEn
 add wave -noupdate -divider {New Divider}
 add wave -noupdate /processorrv_tb/i_processor/RegsRISCV/regs
 add wave -noupdate -divider {PC values}
-add wave -noupdate -radix unsigned /processorrv_tb/i_processor/PC_reg
-add wave -noupdate -radix unsigned /processorrv_tb/i_processor/PC_next
-add wave -noupdate -radix unsigned /processorrv_tb/i_processor/PC_plus4
+add wave -noupdate -radix unsigned /processorrv_tb/i_processor/PC_regIF
+add wave -noupdate -radix unsigned /processorrv_tb/i_processor/PC_nextIF
+add wave -noupdate -radix unsigned /processorrv_tb/i_processor/PC_plus4IF
+add wave -noupdate -divider {RegBank}
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {112 ns} 0}
 quietly wave cursor active 1
