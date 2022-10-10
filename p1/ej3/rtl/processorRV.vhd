@@ -131,7 +131,7 @@ architecture rtl of processorRV is
   -- Instruction fields (Generadas en ID)
   signal Funct3ID         : std_logic_vector(2 downto 0);
   signal Funct7ID         : std_logic_vector(6 downto 0);
-  signal RDID             : std_logic_vector(4 downto 0);
+  signal RD_ID             : std_logic_vector(4 downto 0);
 
   --Señales ID/EX
 
@@ -156,7 +156,7 @@ architecture rtl of processorRV is
   signal Funct3IDEX         : std_logic_vector(2 downto 0);
   signal Funct7IDEX         : std_logic_vector(6 downto 0);
 
-  signal RDIDEX             : std_logic_vector(4 downto 0);
+  signal RD_IDEX             : std_logic_vector(4 downto 0);
 
   --Señales EX
 
@@ -183,7 +183,7 @@ architecture rtl of processorRV is
   signal Addr_jalrEXMEM      : std_logic_vector(31 downto 0);
 
   signal reg_RTEXMEM         : std_logic_vector(31 downto 0); --Read data 2
-  signal RDEXMEM             : std_logic_vector(4 downto 0);
+  signal RD_EXMEM             : std_logic_vector(4 downto 0);
 
   signal Alu_ResEXMEM        : std_logic_vector(31 downto 0);
   signal Alu_SIGNEXMEM       : std_logic;
@@ -203,7 +203,7 @@ architecture rtl of processorRV is
   signal Ctrl_ResSrcMEMWB    : std_logic_vector(1 downto 0);  --MemtoReg
 
   signal Alu_ResMEMWB        : std_logic_vector(31 downto 0);
-  signal RDMEMWB             : std_logic_vector(4 downto 0);
+  signal RD_MEMWB             : std_logic_vector(4 downto 0);
 
   signal dataIn_MemMEMWB     : std_logic_vector(31 downto 0); -- From Data Memory
 
@@ -281,7 +281,7 @@ begin
     Rd1   => reg_RSID,
     A2    => InstructionIFID(24 downto 20), --rs2
     Rd2   => reg_RTID,
-    A3    => RDID, --Instruction(11 downto 7),,
+    A3    => RD_MEMWB, --Instruction(11 downto 7),,
     Wd3   => reg_RD_dataWB,
     We3   => Ctrl_RegWriteMEMWB
   );
