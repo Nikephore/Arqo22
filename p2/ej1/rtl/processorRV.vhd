@@ -136,6 +136,8 @@ architecture rtl of processorRV is
   signal Funct3ID         : std_logic_vector(2 downto 0);
   signal Funct7ID         : std_logic_vector(6 downto 0);
   signal RD_ID            : std_logic_vector(4 downto 0);
+  signal RS1_ID           : std_logic_vector(4 downto 0);
+  signal RS2_ID           : std_logic_vector(4 downto 0);
 
   --Señales ID/EX
 
@@ -160,7 +162,9 @@ architecture rtl of processorRV is
   signal Funct3IDEX         : std_logic_vector(2 downto 0);
   signal Funct7IDEX         : std_logic_vector(6 downto 0);
 
-  signal RD_IDEX             : std_logic_vector(4 downto 0);
+  signal RD_IDEX            : std_logic_vector(4 downto 0);
+  signal RS1_IDEX           : std_logic_vector(4 downto 0);
+  signal RS2_IDEX           : std_logic_vector(4 downto 0);
 
   --Señales EX
 
@@ -285,9 +289,9 @@ begin
   port map (
     Clk   => Clk,
     Reset => Reset,
-    A1    => InstructionIFID(19 downto 15), --rs1
+    A1    => RS1_ID, --rs1
     Rd1   => reg_RSID,
-    A2    => InstructionIFID(24 downto 20), --rs2
+    A2    => RS2_ID, --rs2
     Rd2   => reg_RTID,
     A3    => RD_MEMWB, 
     Wd3   => reg_RD_dataWB,
@@ -303,13 +307,15 @@ begin
   -- DIVISION DEL CAMPO INSTRUCTION  -------------------------------------------------
   Funct3ID      <= InstructionIFID(14 downto 12); -- Campo "funct3" de la instruccion
   Funct7ID      <= InstructionIFID(31 downto 25); -- Campo "funct7" de la instruccion
-  RD_ID          <= InstructionIFID(11 downto 7);
+  RS1_ID        <= InstructionIFID(19 downto 15);
+  RS2_ID        InstructionIFID(24 downto 20);
+  RD_ID         <= InstructionIFID(11 downto 7);
   ------------------------------------------------------------------------------------
 
   -- Deteccion de Hazard UNIT
   Ctrl_HazardID <= '1' when Ctrl_MemReadIDEX = '1' and
-                    ((InstructionIFID(25 downto 21) = InstructionIDEX_RT) or
-                    (InstructionIFID(20 downto 16) = InstructionIDEX_RT)) else '0';
+                    ((InstructionIFID(19 downto 15) = RD_IDEX) or
+                    (InstructionIFID(24 downto 20) = RD_IDEX)) else '0';  
 
   ---------------------------------------------------
   -- IDEX PROCESS
@@ -330,9 +336,11 @@ begin
       Funct7IDEX          <= (others => '0');
       Inm_extIDEX         <= (others => '0');
       PC_regIDEX          <= (others => '0');
-      RD_IDEX              <= (others => '0');
+      RD_IDEX             <= (others => '0');
       reg_RSIDEX          <= (others => '0');
       reg_RTIDEX          <= (others => '0');
+      RS1_IDEX            <= (others => '0');
+      RS2_IDEX            <= (others => '0');
     elsif rising_edge(Clk) then
       Ctrl_ALUSrcIDEX     <= Ctrl_ALUSrcID;
       Ctrl_BranchIDEX     <= Ctrl_BranchID;
@@ -347,9 +355,12 @@ begin
       Funct7IDEX          <= Funct7ID;
       Inm_extIDEX         <= Inm_extID;
       PC_regIDEX          <= PC_regIFID;
-      RD_IDEX              <= RD_ID;
+      RD_IDEX             <= RD_ID;
       reg_RSIDEX          <= reg_RSID;
       reg_RTIDEX          <= reg_RTID;
+      RS1_IDEX            <= RS1_ID;
+      RS2_IDEX            <= RS2_ID;
+
     end if;
   end process;
 
@@ -393,23 +404,23 @@ begin
                 RD_MEMWB /= "00000" and not
                 ( Ctrl_RegWriteEXMEM = '1' and
                 RD_EXMEM /= "00000" and
-                RD_EXMEM = InstructionIDEX_RS) and
-                RD_MEMWB = InstructionIDEX_RS else
+                RD_EXMEM = RS2_IDEX) and
+                RD_MEMWB = RS2_IDEX else
                 Alu_ResEXMEM when Ctrl_RegWriteEXMEM = '1' and
                 RD_EXMEM /= "00000" and
-                RD_EXMEM = InstructionIDEX_RS else
+                RD_EXMEM = RS2_IDEX else
                 reg_RSIDEX;
 
 
-  Alu_Op2_FWEX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
+  Alu_Op2_EX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
                   RD_MEMWB /= "00000" and not
                   ( Ctrl_RegWriteEXMEM = '1' and
                   RD_EXMEM /= "00000" and
-                  RD_EXMEM = InstructionIDEX_RT) and
-                  RD_MEMWB = InstructionIDEX_RT else
+                  RD_EXMEM = RS1_IDEX) and
+                  RD_MEMWB = RS1_IDEX else
                   Alu_ResEXMEM when Ctrl_RegWriteEXMEM = '1' and
                   RD_EXMEM /= "00000" and
-                  RD_EXMEM = InstructionIDEX_RT else
+                  RD_EXMEM = RS1_IDEX else
                   reg_RTIDEX;
 
 
