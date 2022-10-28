@@ -258,7 +258,7 @@ begin
     if Reset = '1' then
       PC_regIFID      <= (others => '0');
       InstructionIFID <= (others => '0');
-    elsif rising_edge(Clk) and Write_Disable = '0' then
+    elsif rising_edge(Clk) and Write_DisableIFID = '0' then
       PC_regIFID      <= PC_regIF;
       InstructionIFID <= InstructionIF;
     end if;
@@ -308,7 +308,7 @@ begin
   Funct3ID      <= InstructionIFID(14 downto 12); -- Campo "funct3" de la instruccion
   Funct7ID      <= InstructionIFID(31 downto 25); -- Campo "funct7" de la instruccion
   RS1_ID        <= InstructionIFID(19 downto 15);
-  RS2_ID        InstructionIFID(24 downto 20);
+  RS2_ID        <= InstructionIFID(24 downto 20);
   RD_ID         <= InstructionIFID(11 downto 7);
   ------------------------------------------------------------------------------------
 
@@ -322,7 +322,7 @@ begin
   ---------------------------------------------------
   IDEX_process: process(Clk, Reset)
   begin
-    if Reset = '1' or (Ctrl_HazardID <= '1' and rising_edge(Clk)) then
+    if Reset = '1' or (Ctrl_HazardID = '1' and rising_edge(Clk)) then
       Ctrl_ALUSrcIDEX     <= '0';
       Ctrl_BranchIDEX     <= '0';
       Ctrl_JalrIDEX       <= '0';
@@ -400,7 +400,7 @@ begin
     ALUControl => AluControlEX -- Define operacion a ejecutar por la ALU
   );
 
-  Alu_Op1EX <= RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
+  Alu_Op1EX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
                 RD_MEMWB /= "00000" and not
                 ( Ctrl_RegWriteEXMEM = '1' and
                 RD_EXMEM /= "00000" and
@@ -412,7 +412,7 @@ begin
                 reg_RSIDEX;
 
 
-  Alu_Op2_EX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
+  Alu_Op2EX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
                   RD_MEMWB /= "00000" and not
                   ( Ctrl_RegWriteEXMEM = '1' and
                   RD_EXMEM /= "00000" and
