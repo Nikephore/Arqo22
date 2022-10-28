@@ -219,13 +219,20 @@ architecture rtl of processorRV is
   
   signal reg_RD_dataWB  : std_logic_vector(31 downto 0);
 
+  --Forwarding Unit
+  signal Mux_A : std_logic_vector(31 downto 0);
+  signal Mux_B : std_logic_vector(31 downto 0);
+
+  signal forwardA : std_logic_vector(1 downto 0);
+  signal forwardB : std_logic_vector(1 downto 0);
+
 begin
 
   -- Multiplexor IF --------------------------------------------------------
   PC_nextIF <= Addr_Jump_destMEM when desition_JumpMEM = '1' else PC_plus4IF;
   --------------------------------------------------------------------------
 
-  PCWrite_DisableIF <= '1' when Ctrl_HazardID = '1' else '0';
+  PCWrite_DisableIF <= Ctrl_HazardID;
 
   ---------------------------------------------------
   -- PC REGISTER PROCESS
@@ -251,9 +258,9 @@ begin
   ---------------------------------------------------
   -- IFID PROCESS
   ---------------------------------------------------
-  Write_DisableIFID <= '1' when Ctrl_HazardID = '1' else '0';
+  Write_DisableIFID <= Ctrl_HazardID;
 
-  IF_ID_REG: process(Clk, Reset, Write_DisableIFID)
+  IF_ID_REG: process(Clk, Reset)
   begin
     if Reset = '1' then
       PC_regIFID      <= (others => '0');
@@ -314,15 +321,15 @@ begin
 
   -- Deteccion de Hazard UNIT
   Ctrl_HazardID <= '1' when Ctrl_MemReadIDEX = '1' and
-                    ((InstructionIFID(19 downto 15) = RD_IDEX) or
-                    (InstructionIFID(24 downto 20) = RD_IDEX)) else '0';  
+                    ((RS1_ID = RD_IDEX) or
+                    (RS2_ID = RD_IDEX)) else '0';  
 
   ---------------------------------------------------
   -- IDEX PROCESS
   ---------------------------------------------------
   IDEX_process: process(Clk, Reset)
   begin
-    if Reset = '1' or (Ctrl_HazardID = '1' and rising_edge(Clk)) then
+    if Reset = '1' then
       Ctrl_ALUSrcIDEX     <= '0';
       Ctrl_BranchIDEX     <= '0';
       Ctrl_JalrIDEX       <= '0';
@@ -383,12 +390,31 @@ begin
   -- Multiplexor EX1 --------------------------------------------
   Alu_Op1EX    <= PC_regIDEX     when Ctrl_PcLuiIDEX = "00" else
                 (others => '0')  when Ctrl_PcLuiIDEX = "01" else
-                reg_RSIDEX; -- any other
+                Mux_A; -- any other
   ---------------------------------------------------------------
 
+  Mux_A       <=  reg_RSIDEX     when fordwardA = "00" else
+                  Alu_ResEXMEM   when fordwardA = "10" else
+                  reg_RD_dataWB  when fordwardA = "01" else
+                  (others => '0');
+
+  fordwardA   <=  "10"  when Ctrl_RegWriteEXMEM = '1' and RD_EXMEM /= "00000" and RD_EXMEM = RS1_IDEX else
+                  "01"  when Ctrl_RegWriteMEMWB = '1' and RD_MEMWB /= "00000" and RD_EXMEM /= RS1_IDEX and RD_MEMWB = RS1_IDEX else
+                  "00";
+
+
   -- Multiplexor EX2 -----------------------------------------------------
-  Alu_Op2EX    <= reg_RTIDEX when Ctrl_ALUSrcIDEX = '0' else Inm_extIDEX;
+  Alu_Op2EX    <= Mux_B when Ctrl_ALUSrcIDEX = '0' else Inm_extIDEX;
   ------------------------------------------------------------------------
+
+  Mux_B       <=  reg_RTIDEX     when fordwardB = "00" else
+                  Alu_ResEXMEM   when fordwardB = "10" else
+                  reg_RD_dataWB  when fordwardB = "01" else
+                  (others => '0');
+
+  fordwardB   <=  "10"  when Ctrl_RegWriteEXMEM = '1' and RD_EXMEM /= "00000" and RD_EXMEM = RS2_IDEX else
+                  "01"  when Ctrl_RegWriteMEMWB = '1' and RD_MEMWB /= "00000" and RD_EXMEM /= RS2_IDEX and RD_MEMWB = RS2_IDEX else
+                  "00";
 
   Alu_control_i: alu_control
   port map(
@@ -399,30 +425,6 @@ begin
     -- Salida de control para la ALU:
     ALUControl => AluControlEX -- Define operacion a ejecutar por la ALU
   );
-
-  Alu_Op1EX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
-                RD_MEMWB /= "00000" and not
-                ( Ctrl_RegWriteEXMEM = '1' and
-                RD_EXMEM /= "00000" and
-                RD_EXMEM = RS2_IDEX) and
-                RD_MEMWB = RS2_IDEX else
-                Alu_ResEXMEM when Ctrl_RegWriteEXMEM = '1' and
-                RD_EXMEM /= "00000" and
-                RD_EXMEM = RS2_IDEX else
-                reg_RSIDEX;
-
-
-  Alu_Op2EX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
-                  RD_MEMWB /= "00000" and not
-                  ( Ctrl_RegWriteEXMEM = '1' and
-                  RD_EXMEM /= "00000" and
-                  RD_EXMEM = RS1_IDEX) and
-                  RD_MEMWB = RS1_IDEX else
-                  Alu_ResEXMEM when Ctrl_RegWriteEXMEM = '1' and
-                  RD_EXMEM /= "00000" and
-                  RD_EXMEM = RS1_IDEX else
-                  reg_RTIDEX;
-
 
   ---------------------------------------------------
   -- EXMEM PROCESS
