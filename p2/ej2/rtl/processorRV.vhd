@@ -96,19 +96,21 @@ architecture rtl of processorRV is
 
   --Señales IF
 
-  signal branch_true      : std_logic;
-  signal PC_nextIF        : std_logic_vector(31 downto 0);
-  signal PC_regIF         : std_logic_vector(31 downto 0);
-  signal PC_plus4IF       : std_logic_vector(31 downto 0);
+  signal branch_true        : std_logic;
+  signal PC_nextIF          : std_logic_vector(31 downto 0);
+  signal PC_regIF           : std_logic_vector(31 downto 0);
+  signal PC_plus4IF         : std_logic_vector(31 downto 0);
 
-  signal InstructionIF   : std_logic_vector(31 downto 0); -- La instrucción desde lamem de instr
+  signal InstructionIF      : std_logic_vector(31 downto 0); -- La instrucción desde lamem de instr
 
+  signal PCWrite_DisableIF  : std_logic;
 
   --Señales IF/ID
 
-  signal PC_regIFID       : std_logic_vector(31 downto 0);
-  signal InstructionIFID : std_logic_vector(31 downto 0);
+  signal PC_regIFID         : std_logic_vector(31 downto 0);
+  signal InstructionIFID    : std_logic_vector(31 downto 0);
 
+  signal Write_DisableIFID  : std_logic;
 
   --Señales ID
 
@@ -123,6 +125,8 @@ architecture rtl of processorRV is
   signal Ctrl_PcLuiID     : std_logic_vector(1 downto 0);
   signal Ctrl_ResSrcID    : std_logic_vector(1 downto 0);  --MemtoReg
 
+  signal Ctrl_HazardID    : std_logic;
+
   signal Inm_extID        : std_logic_vector(31 downto 0); -- La parte baja de la instrucción extendida de signo
 
   signal reg_RSID         : std_logic_vector(31 downto 0); --Read data 1
@@ -131,7 +135,7 @@ architecture rtl of processorRV is
   -- Instruction fields (Generadas en ID)
   signal Funct3ID         : std_logic_vector(2 downto 0);
   signal Funct7ID         : std_logic_vector(6 downto 0);
-  signal RD_ID             : std_logic_vector(4 downto 0);
+  signal RD_ID            : std_logic_vector(4 downto 0);
 
   --Señales ID/EX
 
@@ -217,14 +221,16 @@ begin
   PC_nextIF <= Addr_Jump_destMEM when desition_JumpMEM = '1' else PC_plus4IF;
   --------------------------------------------------------------------------
 
+  PCWrite_DisableIF <= '1' when Ctrl_HazardID = '1' else '0';
+
   ---------------------------------------------------
   -- PC REGISTER PROCESS
   ---------------------------------------------------
-  PC_reg_proc: process(Clk, Reset)
+  PC_reg_proc: process(Clk, Reset, Ctrl_BranchID, Ctrl_BranchIDEX)
   begin
     if Reset = '1' then
       PC_regIF <= (22 => '1', others => '0'); -- 0040_0000
-    elsif rising_edge(Clk) then
+    elsif rising_edge(Clk) and PCWrite_disableIF = '0' and  Ctrl_BranchID = '0' and Ctrl_BranchIDEX = '0' then
       PC_regIF <= PC_nextIF;
     end if;
   end process;
@@ -241,12 +247,14 @@ begin
   ---------------------------------------------------
   -- IFID PROCESS
   ---------------------------------------------------
-  IF_ID_REG: process(Clk, Reset)
+  Write_DisableIFID <= '1' when Ctrl_HazardID = '1' else '0';
+
+  IF_ID_REG: process(Clk, Reset, Write_DisableIFID, Ctrl_BranchID, Ctrl_BranchIDEX, Ctrl_BranchEXMEM)
   begin
-    if Reset = '1' then
+    if Reset = '1' or (( Ctrl_BranchID = '1' or Ctrl_BranchIDEX = '1' or Ctrl_BranchEXMEM = '1') and rising_edge(Clk) and Write_DisableIFID = '0') then
       PC_regIFID      <= (others => '0');
       InstructionIFID <= (others => '0');
-    elsif rising_edge(Clk) then
+    elsif rising_edge(Clk) and Write_Disable = '0' then
       PC_regIFID      <= PC_regIF;
       InstructionIFID <= InstructionIF;
     end if;
@@ -298,12 +306,41 @@ begin
   RD_ID          <= InstructionIFID(11 downto 7);
   ------------------------------------------------------------------------------------
 
+  -- Unidad de deteccion de riesgos
+  Ctrl_HazardID <= '1' when 
+               (Ctrl_MemReadIDEX = '1' and
+                    (
+                        (InstructionIFID(24 downto 20) = reg_RTIDEX)
+                        or
+                        (InstructionIFID(19 downto 15) = reg_RTIDEX)
+                    )
+                )
+                    or
+                    ( 
+                        ( Ctrl_BranchID ='1' and
+                           (
+                           (InstructionIFID(24 downto 20) = reg_RSIDEX)
+                           or 
+                           (InstructionIFID(19 downto 15) = reg_RSIDEX)
+                           )
+                        or
+                        (  Ctrl_ALUSrcIDEX = '1' and 
+                           (
+                              ( reg_RTIDEX = InstructionIFID(24 downto 20))
+                              or
+                              ( reg_RTIDEX = InstructionIFID(19 downto 15))
+                              )
+                           )
+                        )
+                     )
+                     else '0';
+
   ---------------------------------------------------
   -- IDEX PROCESS
   ---------------------------------------------------
   IDEX_process: process(Clk, Reset)
   begin
-    if Reset = '1' then
+    if Reset = '1' or (Ctrl_HazardID <= '1' and rising_edge(Clk)) then
       Ctrl_ALUSrcIDEX     <= '0';
       Ctrl_BranchIDEX     <= '0';
       Ctrl_JalrIDEX       <= '0';
@@ -375,6 +412,29 @@ begin
     -- Salida de control para la ALU:
     ALUControl => AluControlEX -- Define operacion a ejecutar por la ALU
   );
+
+  Alu_Op1EX <= RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
+                RD_MEMWB /= "00000" and not
+                ( Ctrl_RegWriteEXMEM = '1' and
+                RD_EXMEM /= "00000" and
+                RD_EXMEM = InstructionIDEX_RS) and
+                RD_MEMWB = InstructionIDEX_RS else
+                Alu_ResEXMEM when Ctrl_RegWriteEXMEM = '1' and
+                RD_EXMEM /= "00000" and
+                RD_EXMEM = InstructionIDEX_RS else
+                reg_RSIDEX;
+
+
+  Alu_Op2_FWEX <= reg_RD_dataWB when Ctrl_RegWriteMEMWB = '1' and
+                  RD_MEMWB /= "00000" and not
+                  ( Ctrl_RegWriteEXMEM = '1' and
+                  RD_EXMEM /= "00000" and
+                  RD_EXMEM = InstructionIDEX_RT) and
+                  RD_MEMWB = InstructionIDEX_RT else
+                  Alu_ResEXMEM when Ctrl_RegWriteEXMEM = '1' and
+                  RD_EXMEM /= "00000" and
+                  RD_EXMEM = InstructionIDEX_RT else
+                  reg_RTIDEX;
 
 
   ---------------------------------------------------

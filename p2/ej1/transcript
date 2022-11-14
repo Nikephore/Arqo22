@@ -1,0 +1,284 @@
+# //  Questa Sim-64
+# //  Version 10.6c linux_x86_64 Jul 25 2017
+# //
+# //  Copyright 1991-2017 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+ls
+# rtl
+# sim
+# transcript
+cd sim
+do runsim_arq.do
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:50 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 ../rtl/RISCV_pack.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Compiling package RISCV_pack
+# -- Compiling package body RISCV_pack
+# -- Loading package RISCV_pack
+# End time: 14:06:50 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:50 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit -check_synthesis ../rtl/reg_bank.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Compiling entity reg_bank
+# -- Compiling architecture rtl of reg_bank
+# End time: 14:06:50 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:50 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit -check_synthesis ../rtl/alu_RV.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package RISCV_pack
+# -- Compiling entity alu_RV
+# -- Compiling architecture rtl of alu_RV
+# End time: 14:06:50 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:50 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit -check_synthesis ../rtl/alu_control.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package RISCV_pack
+# -- Compiling entity alu_control
+# -- Compiling architecture rtl of alu_control
+# End time: 14:06:50 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:50 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit -check_synthesis ../rtl/control_unit.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package RISCV_pack
+# -- Compiling entity control_unit
+# -- Compiling architecture rtl of control_unit
+# End time: 14:06:50 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:50 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit -check_synthesis ../rtl/Imm_Generator.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package RISCV_pack
+# -- Compiling entity Imm_Gen
+# -- Compiling architecture rtl of Imm_Gen
+# End time: 14:06:51 on Oct 28,2022, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:51 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit -check_synthesis ../rtl/processorRV.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package RISCV_pack
+# -- Compiling entity processorRV
+# -- Compiling architecture rtl of processorRV
+# ** Warning: ../rtl/processorRV.vhd(256): Synthesis Warning: Signal 'Write_DisableIFID' appears in the sensitivity list of process 'IF_ID_REG', but it is not used in the clock or reset expressions.
+# ** Warning: ../rtl/processorRV.vhd(323): Synthesis Warning: Clock signal 'Clk' cannot be used in an asynchronous condition.
+# End time: 14:06:51 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 2
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:51 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit memory_data.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package std_logic_textio
+# -- Compiling entity memory_data
+# -- Compiling architecture Behavioral of memory_data
+# End time: 14:06:51 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:51 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit memory_instr.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Loading package std_logic_textio
+# -- Compiling entity memory_instr
+# -- Compiling architecture Behavioral of memory_instr
+# End time: 14:06:51 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 10.6c Compiler 2017.07 Jul 25 2017
+# Start time: 14:06:51 on Oct 28,2022
+# vcom -reportprogress 300 -work work -2008 -explicit processorR5_tb.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package std_logic_arith
+# -- Loading package STD_LOGIC_UNSIGNED
+# -- Compiling entity processorRV_tb
+# -- Compiling architecture tb of processorRV_tb
+# End time: 14:06:51 on Oct 28,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vsim processorRV_tb -gN_CYCLES=150 -gINIT_FILENAME_DATA="datos.txt" -gINIT_FILENAME_INST="instrucciones.txt" 
+# Start time: 14:06:51 on Oct 28,2022
+# ** Note: (vsim-3812) Design is being optimized...
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.std_logic_arith(body)
+# Loading ieee.std_logic_unsigned(body)
+# Loading ieee.numeric_std(body)
+# Loading ieee.std_logic_textio(body)
+# Loading work.processorrv_tb(tb)#1
+# Loading work.riscv_pack(body)
+# Loading work.processorrv(rtl)#1
+# Loading work.memory_instr(behavioral)#1
+# 1
+# ** Note: COMIENZA LA SIMULACION
+#    Time: 0 ns  Iteration: 0  Instance: /processorrv_tb
+# ** Note: Se ha cargado la memoria 'datos.txt'
+#    Time: 0 ns  Iteration: 0  Instance: /processorrv_tb/i_data_mem
+# ** Note: Se ha cargado la memoria 'instrucciones.txt'
+#    Time: 0 ns  Iteration: 0  Instance: /processorrv_tb/i_inst_mem
+# 0
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 55 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 65 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 65 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 65 ns  Iteration: 5  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 75 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 75 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 85 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 85 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 85 ns  Iteration: 4  Instance: /processorrv_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 95 ns  Iteration: 2  Instance: /processorrv_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 95 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 95 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 95 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 95 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 105 ns  Iteration: 2  Instance: /processorrv_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 105 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 105 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 105 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 105 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 115 ns  Iteration: 2  Instance: /processorrv_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 115 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 115 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 115 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 115 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 125 ns  Iteration: 2  Instance: /processorrv_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 125 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 125 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 125 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 125 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 135 ns  Iteration: 2  Instance: /processorrv_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 135 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 135 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 135 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 135 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 145 ns  Iteration: 2  Instance: /processorrv_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 145 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 145 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 145 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 145 ns  Iteration: 3  Instance: /processorrv_tb/i_processor/Alu_RISCV
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 155 ns  Iteration: 1  Instance: /processorrv_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 155 ns  Iteration: 1  Instance: /processorrv_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 155 ns  Iteration: 1  Instance: /processorrv_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 155 ns  Iteration: 1  Instance: /processorrv_tb/i_data_mem
+# ** Fatal: (vsim-3421) Value -67125248 is out of range 0 to 2047.
+#    Time: 155 ns  Iteration: 1  Process: /processorrv_tb/i_data_mem/init_mem File: memory_data.vhd
+# Fatal error in Process init_mem at memory_data.vhd line 97
+# 
+# HDL call sequence:
+# Stopped at memory_data.vhd 97 Process init_mem
+# 
+# End time: 14:11:29 on Oct 28,2022, Elapsed time: 0:04:38
+# Errors: 2, Warnings: 100

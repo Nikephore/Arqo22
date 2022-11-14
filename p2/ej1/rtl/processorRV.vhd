@@ -96,19 +96,21 @@ architecture rtl of processorRV is
 
   --Señales IF
 
-  signal branch_true      : std_logic;
-  signal PC_nextIF        : std_logic_vector(31 downto 0);
-  signal PC_regIF         : std_logic_vector(31 downto 0);
-  signal PC_plus4IF       : std_logic_vector(31 downto 0);
+  signal branch_true        : std_logic;
+  signal PC_nextIF          : std_logic_vector(31 downto 0);
+  signal PC_regIF           : std_logic_vector(31 downto 0);
+  signal PC_plus4IF         : std_logic_vector(31 downto 0);
 
-  signal InstructionIF   : std_logic_vector(31 downto 0); -- La instrucción desde lamem de instr
+  signal InstructionIF      : std_logic_vector(31 downto 0); -- La instrucción desde lamem de instr
 
+  signal PCWrite_DisableIF  : std_logic;
 
   --Señales IF/ID
 
-  signal PC_regIFID       : std_logic_vector(31 downto 0);
-  signal InstructionIFID : std_logic_vector(31 downto 0);
+  signal PC_regIFID         : std_logic_vector(31 downto 0);
+  signal InstructionIFID    : std_logic_vector(31 downto 0);
 
+  signal Write_DisableIFID  : std_logic;
 
   --Señales ID
 
@@ -123,6 +125,8 @@ architecture rtl of processorRV is
   signal Ctrl_PcLuiID     : std_logic_vector(1 downto 0);
   signal Ctrl_ResSrcID    : std_logic_vector(1 downto 0);  --MemtoReg
 
+  signal Ctrl_HazardID    : std_logic;
+
   signal Inm_extID        : std_logic_vector(31 downto 0); -- La parte baja de la instrucción extendida de signo
 
   signal reg_RSID         : std_logic_vector(31 downto 0); --Read data 1
@@ -131,7 +135,9 @@ architecture rtl of processorRV is
   -- Instruction fields (Generadas en ID)
   signal Funct3ID         : std_logic_vector(2 downto 0);
   signal Funct7ID         : std_logic_vector(6 downto 0);
-  signal RD_ID             : std_logic_vector(4 downto 0);
+  signal RD_ID            : std_logic_vector(4 downto 0);
+  signal RS1_ID           : std_logic_vector(4 downto 0);
+  signal RS2_ID           : std_logic_vector(4 downto 0);
 
   --Señales ID/EX
 
@@ -156,7 +162,9 @@ architecture rtl of processorRV is
   signal Funct3IDEX         : std_logic_vector(2 downto 0);
   signal Funct7IDEX         : std_logic_vector(6 downto 0);
 
-  signal RD_IDEX             : std_logic_vector(4 downto 0);
+  signal RD_IDEX            : std_logic_vector(4 downto 0);
+  signal RS1_IDEX           : std_logic_vector(4 downto 0);
+  signal RS2_IDEX           : std_logic_vector(4 downto 0);
 
   --Señales EX
 
@@ -211,11 +219,20 @@ architecture rtl of processorRV is
   
   signal reg_RD_dataWB  : std_logic_vector(31 downto 0);
 
+  --Forwarding Unit
+  signal Mux_A : std_logic_vector(31 downto 0);
+  signal Mux_B : std_logic_vector(31 downto 0);
+
+  signal forwardA : std_logic_vector(1 downto 0);
+  signal forwardB : std_logic_vector(1 downto 0);
+
 begin
 
   -- Multiplexor IF --------------------------------------------------------
   PC_nextIF <= Addr_Jump_destMEM when desition_JumpMEM = '1' else PC_plus4IF;
   --------------------------------------------------------------------------
+
+  PCWrite_DisableIF <= Ctrl_HazardID;
 
   ---------------------------------------------------
   -- PC REGISTER PROCESS
@@ -224,7 +241,7 @@ begin
   begin
     if Reset = '1' then
       PC_regIF <= (22 => '1', others => '0'); -- 0040_0000
-    elsif rising_edge(Clk) then
+    elsif rising_edge(Clk) and PCWrite_disableIF = '0' then
       PC_regIF <= PC_nextIF;
     end if;
   end process;
@@ -241,12 +258,14 @@ begin
   ---------------------------------------------------
   -- IFID PROCESS
   ---------------------------------------------------
+  Write_DisableIFID <= Ctrl_HazardID;
+
   IF_ID_REG: process(Clk, Reset)
   begin
     if Reset = '1' then
       PC_regIFID      <= (others => '0');
       InstructionIFID <= (others => '0');
-    elsif rising_edge(Clk) then
+    elsif rising_edge(Clk) and Write_DisableIFID = '0' then
       PC_regIFID      <= PC_regIF;
       InstructionIFID <= InstructionIF;
     end if;
@@ -277,9 +296,9 @@ begin
   port map (
     Clk   => Clk,
     Reset => Reset,
-    A1    => InstructionIFID(19 downto 15), --rs1
+    A1    => RS1_ID, --rs1
     Rd1   => reg_RSID,
-    A2    => InstructionIFID(24 downto 20), --rs2
+    A2    => RS2_ID, --rs2
     Rd2   => reg_RTID,
     A3    => RD_MEMWB, 
     Wd3   => reg_RD_dataWB,
@@ -295,8 +314,15 @@ begin
   -- DIVISION DEL CAMPO INSTRUCTION  -------------------------------------------------
   Funct3ID      <= InstructionIFID(14 downto 12); -- Campo "funct3" de la instruccion
   Funct7ID      <= InstructionIFID(31 downto 25); -- Campo "funct7" de la instruccion
-  RD_ID          <= InstructionIFID(11 downto 7);
+  RS1_ID        <= InstructionIFID(19 downto 15);
+  RS2_ID        <= InstructionIFID(24 downto 20);
+  RD_ID         <= InstructionIFID(11 downto 7);
   ------------------------------------------------------------------------------------
+
+  -- Deteccion de Hazard UNIT
+  Ctrl_HazardID <= '1' when Ctrl_MemReadIDEX = '1' and
+                    ((RS1_ID = RD_IDEX) or
+                    (RS2_ID = RD_IDEX)) else '0';  
 
   ---------------------------------------------------
   -- IDEX PROCESS
@@ -317,9 +343,11 @@ begin
       Funct7IDEX          <= (others => '0');
       Inm_extIDEX         <= (others => '0');
       PC_regIDEX          <= (others => '0');
-      RD_IDEX              <= (others => '0');
+      RD_IDEX             <= (others => '0');
       reg_RSIDEX          <= (others => '0');
       reg_RTIDEX          <= (others => '0');
+      RS1_IDEX            <= (others => '0');
+      RS2_IDEX            <= (others => '0');
     elsif rising_edge(Clk) then
       Ctrl_ALUSrcIDEX     <= Ctrl_ALUSrcID;
       Ctrl_BranchIDEX     <= Ctrl_BranchID;
@@ -334,9 +362,12 @@ begin
       Funct7IDEX          <= Funct7ID;
       Inm_extIDEX         <= Inm_extID;
       PC_regIDEX          <= PC_regIFID;
-      RD_IDEX              <= RD_ID;
+      RD_IDEX             <= RD_ID;
       reg_RSIDEX          <= reg_RSID;
       reg_RTIDEX          <= reg_RTID;
+      RS1_IDEX            <= RS1_ID;
+      RS2_IDEX            <= RS2_ID;
+
     end if;
   end process;
 
@@ -359,12 +390,31 @@ begin
   -- Multiplexor EX1 --------------------------------------------
   Alu_Op1EX    <= PC_regIDEX     when Ctrl_PcLuiIDEX = "00" else
                 (others => '0')  when Ctrl_PcLuiIDEX = "01" else
-                reg_RSIDEX; -- any other
+                Mux_A; -- any other
   ---------------------------------------------------------------
 
+  Mux_A       <=  reg_RSIDEX     when fordwardA = "00" else
+                  Alu_ResEXMEM   when fordwardA = "10" else
+                  reg_RD_dataWB  when fordwardA = "01" else
+                  (others => '0');
+
+  fordwardA   <=  "10"  when Ctrl_RegWriteEXMEM = '1' and RD_EXMEM /= "00000" and RD_EXMEM = RS1_IDEX else
+                  "01"  when Ctrl_RegWriteMEMWB = '1' and RD_MEMWB /= "00000" and RD_EXMEM /= RS1_IDEX and RD_MEMWB = RS1_IDEX else
+                  "00";
+
+
   -- Multiplexor EX2 -----------------------------------------------------
-  Alu_Op2EX    <= reg_RTIDEX when Ctrl_ALUSrcIDEX = '0' else Inm_extIDEX;
+  Alu_Op2EX    <= Mux_B when Ctrl_ALUSrcIDEX = '0' else Inm_extIDEX;
   ------------------------------------------------------------------------
+
+  Mux_B       <=  reg_RTIDEX     when fordwardB = "00" else
+                  Alu_ResEXMEM   when fordwardB = "10" else
+                  reg_RD_dataWB  when fordwardB = "01" else
+                  (others => '0');
+
+  fordwardB   <=  "10"  when Ctrl_RegWriteEXMEM = '1' and RD_EXMEM /= "00000" and RD_EXMEM = RS2_IDEX else
+                  "01"  when Ctrl_RegWriteMEMWB = '1' and RD_MEMWB /= "00000" and RD_EXMEM /= RS2_IDEX and RD_MEMWB = RS2_IDEX else
+                  "00";
 
   Alu_control_i: alu_control
   port map(
@@ -375,7 +425,6 @@ begin
     -- Salida de control para la ALU:
     ALUControl => AluControlEX -- Define operacion a ejecutar por la ALU
   );
-
 
   ---------------------------------------------------
   -- EXMEM PROCESS
