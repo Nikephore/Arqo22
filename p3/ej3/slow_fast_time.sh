@@ -11,9 +11,9 @@ export PATH=$PATH:/share/apps/tools/valgrind/bin:/share/apps/tools/gnuplot/bin
 export VALGRIND_LIB=/share/apps/tools/valgrind/lib/valgrind
 
 #inicializar variables
-Ninicio=$((256 + 256 * 13))
+Ninicio=$((256 + 256 * 6))
 Npaso=32
-Nfinal=$((256 + 256 * 14))
+Nfinal=$((256 + 256 * 7))
 fDAT=mult.dat
 fPNG_Cache=mult_cache.png
 fPNG_Time=mult_time.png

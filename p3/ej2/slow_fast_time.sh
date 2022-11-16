@@ -11,9 +11,9 @@ export PATH=$PATH:/share/apps/tools/valgrind/bin:/share/apps/tools/gnuplot/bin
 export VALGRIND_LIB=/share/apps/tools/valgrind/lib/valgrind
 
 # inicializar variables
-Ninicio=$((1024 + 1024 * 13))
+Ninicio=$((1024 + 1024 * 6))
 Npaso=256
-Nfinal=$((1024 + 1024 * 14))
+Nfinal=$((1024 + 1024 * 7))
 tamanios=(1024 2048 4096 8192)
 
 rm -f ./*.dat ./*.png
