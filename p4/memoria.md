@@ -46,7 +46,7 @@ shadeeon@Shadeeon:~/Universidad/arqo/p4$ ./omp2
 
 Inicio: a = 1,	 b = 2,	 c = 3
 
-	 &a = 0x7fffb473d594,x	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d59c
+   &a = 0x7fffb473d594,x	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d59c
 
 [Hilo 0]-1: a = 0,	 b = 2,	 c = 3
 
@@ -74,7 +74,7 @@ Inicio: a = 1,	 b = 2,	 c = 3
 
 Fin: a = 1,	 b = 10,	 c = 3
 
-	 &a = 0x7fffb473d594,	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d59c
+   &a = 0x7fffb473d594,	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d59c
 -----------------------------------------------------------------------
 
 
