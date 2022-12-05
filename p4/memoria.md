@@ -155,11 +155,12 @@ Para rellenar la tabla lo haremos ejecutando los programas sobre una
 matriz de 1750x1750
 
 
-version\# hilos		1			2			3			4
-serie				66.64
-paralela-bucle1		66.45		33.49		23.31		17.70
-paralela-bucle2		66.12		35.32		21.92		17.69
-paralela-bucle3		63.45		32.57		21.18		16.68
+| version\# hilo	|	1	|	2	|	3	|	4 |
+|-----------------------|---------------|---------------|---------------|---------|
+| serie			| 66.64		|		|		|	  |
+| paralela-bucle1	| 66.45		| 33.49		| 23.31		| 17.70   |
+| paralela-bucle2	| 66.12		| 35.32		| 21.92		| 17.69   |
+| paralela-bucle3	| 63.45		| 32.57		| 21.18		| 16.68   |
 
 El bucle 1 es el mas interno y el 3 el mas externo
 
