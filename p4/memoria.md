@@ -43,23 +43,37 @@ cláusula -> función -> variable de entorno
 Salida de la ejecucion de omp2
 ----------------------------------------------------------------------
 shadeeon@Shadeeon:~/Universidad/arqo/p4$ ./omp2
+
 Inicio: a = 1,	 b = 2,	 c = 3
+
 	 &a = 0x7fffb473d594,x	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d59c
 
 [Hilo 0]-1: a = 0,	 b = 2,	 c = 3
+
 [Hilo 0]	 &a = 0x7fffb473d530,	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d52c
+
 [Hilo 0]-2: a = 15,	 b = 4,	 c = 3
+
 [Hilo 1]-1: a = 0,	 b = 2,	 c = 3
+
 [Hilo 1]	 &a = 0x7fd51bcece20,	 &b = 0x7fffb473d598,	 &c = 0x7fd51bcece1c
+
 [Hilo 1]-2: a = 21,	 b = 6,	 c = 3
+
 [Hilo 2]-1: a = 0,	 b = 2,	 c = 3
+
 [Hilo 2]	 &a = 0x7fd51b4ebe20,	 &b = 0x7fffb473d598,	 &c = 0x7fd51b4ebe1c
+
 [Hilo 2]-2: a = 27,	 b = 8,	 c = 3
+
 [Hilo 3]-1: a = 0,	 b = 2,	 c = 3
+
 [Hilo 3]	 &a = 0x7fd51aceae20,	 &b = 0x7fffb473d598,	 &c = 0x7fd51aceae1c
+
 [Hilo 3]-2: a = 33,	 b = 10,	 c = 3
 
 Fin: a = 1,	 b = 10,	 c = 3
+
 	 &a = 0x7fffb473d594,	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d59c
 -----------------------------------------------------------------------
 
