@@ -1,8 +1,8 @@
-#Luis Miguel Nucifora & Bernardo Andrés Zambrano
+# Luis Miguel Nucifora & Bernardo Andrés Zambrano
 
-##Numero de pareja -> (2 mod 8) + 1 = 3
+## Numero de pareja -> (2 mod 8) + 1 = 3
 
-###Ejercicio 0
+### Ejercicio 0
 
 
 Para saber si un procesador dispone de hyperthreading necesitamos mirar
@@ -13,17 +13,17 @@ por lo que no tiene hyperthreading
 Mi ordenador dispone de un procesador de 4 cores de 3.10GHz sin hyperthreading.
 
 
-###Ejercicio 1
+### Ejercicio 1
 
 
-####1.1 ¿Se pueden lanzar más threads que cores tenga el sistema? ¿Tiene sentido hacerlo?
+#### 1.1 ¿Se pueden lanzar más threads que cores tenga el sistema? ¿Tiene sentido hacerlo?
 
 Si se pueden, pero no tiene sentido hacerlo ya que buscamos que las tareas
 se realicen en paralelo y no mediante una planificación por parte del SO
 que alterna en la ejecucion de cada uno.
 
 
-####1.2 ¿Cuántos threads debería utilizar en los ordenadores del laboratorio?
+#### 1.2 ¿Cuántos threads debería utilizar en los ordenadores del laboratorio?
 ¿y en el clúster? ¿y en su propio equipo?
 
 El número que corresponda al mayor número de cores lógicos que se encuentren
@@ -33,7 +33,7 @@ En mi equipo no hay hyperthreading, por lo que se deberán lanzar tantos hilos
 como cores físicos haya en la cpu, que serían 4 en este caso.
 
 
-####1.3 Modifique el programa omp1.c para utilizar las tres formas de elegir el
+#### 1.3 Modifique el programa omp1.c para utilizar las tres formas de elegir el
 número de threads y deduzca la prioridad entre ellas.
 
 Tras realizar las distintas pruebas con el archivo omp1.c hemos llegado a la
@@ -66,7 +66,7 @@ Fin: a = 1,	 b = 10,	 c = 3
 -----------------------------------------------------------------------
 
 
-####1.4 ¿Como se comporta OpenMP cuando declaramos una variable privada?
+#### 1.4 ¿Como se comporta OpenMP cuando declaramos una variable privada?
 
 OpenMP crea una nueva variable con el mismo nombre de la privada. La nueva
 variable tiene una dirección de memoria distinta, por lo que al sufrir
@@ -74,7 +74,7 @@ modificaciones estas no se reflejan en la variable del thread master.
 Cada thread tiene una dirección de memoria distinta para esta variable.
 
 
-####1.5 ¿Qué ocurre con el valor de una variable privada al comenzar a ejecutarse
+#### 1.5 ¿Qué ocurre con el valor de una variable privada al comenzar a ejecutarse
 la región paralela?
 
 Si se trata de una variable definida como firstprivate, su valor comienza
@@ -84,12 +84,12 @@ con el de la región no paralela. Tendrá el valor que tenga la región de
 memoria que se le asigna.
 
 
-####1.6 ¿Que ocurre con el valor de una variable privada al finalizar la región paralela?
+#### 1.6 ¿Que ocurre con el valor de una variable privada al finalizar la región paralela?
 
 mantiene el valor que tenía antes de entrar en la región paralela.
 
 
-####1.7 ¿Ocurre lo mismo con las variables públicas?
+#### 1.7 ¿Ocurre lo mismo con las variables públicas?
 
 No. Como puede verse en el ejemplo la dirección de memoria de la variable
 pública es la misma tanto en ambas regiones, por lo que cuando el valor
@@ -97,17 +97,17 @@ se modifica en la región paralela también se ve modificada el valor
 en la región no paralela.
 
 
-###Ejercicio 2
+### Ejercicio 2
 
 
-####2.1 Ejecute la versión serie y entienda cual debe ser el resultado
+#### 2.1 Ejecute la versión serie y entienda cual debe ser el resultado
 para diferentes tamaños de vector.
 
 El programa calcula el producto escalar de dos vectores, por lo que
 el resultado del mismo siempre será el tamaño de los vectores.
 
 
-####2.2 Ejecute el código paralelizado con el pragma openmp y conteste en
+#### 2.2 Ejecute el código paralelizado con el pragma openmp y conteste en
 la memoria a las siguientes preguntas:
 
 - ¿Es correcto el resultado?
@@ -123,7 +123,7 @@ cual los hilos muchas veces no están leyendo el valor real de la
 variable.
 
 
-####2.3 Modifique el código anterior y denomine el programa pescalar_par2:
+#### 2.3 Modifique el código anterior y denomine el programa pescalar_par2:
 
 
 - ¿Puede resolverse con ambas directivas? Indique las modificaciones
@@ -140,7 +140,7 @@ La opción elegida es atomic ya que se trata de una única sentencia RMW
 sencilla y tras hacer algunas pruebas se ha observado que es más rápida.
 
 
-####2.4 Modifique el código anterior y denomine el programa resultante pescalar_par3.
+#### 2.4 Modifique el código anterior y denomine el programa resultante pescalar_par3.
 
 
 - Comparando con el punto anterior ¿Cuál será la opción elegida y por qué?
@@ -150,7 +150,7 @@ resultado correcto y el tiempo de ejecución muestra diferencias bastante
 notables, siendo mucho más rápido que las opciones anteriores.
 
 
-###Ejercicio 3
+### Ejercicio 3
 
 
 Para una matriz de 1000x1000 el programa normal_serie.c tarda 8.74s
@@ -170,7 +170,7 @@ paralela-bucle3		63.45		32.57		21.18		16.68
 El bucle 1 es el mas interno y el 3 el mas externo
 
 
-####3.1 ¿Cuál de las tres versiones obtiene peor rendimiento? ¿A qué se debe?
+#### 3.1 ¿Cuál de las tres versiones obtiene peor rendimiento? ¿A qué se debe?
 ¿Cuál de las tres versiones obtiene mejor rendimiento? ¿A qué se debe?
 
 
@@ -183,7 +183,7 @@ bucle mas interno paralelizado. Su rendimiento se puede deber a que
 hace uso de los recursos estrictamente necesarios.
 
 
-####3.2 En base a los resultados, ¿cree que es preferible la paralelización
+#### 3.2 En base a los resultados, ¿cree que es preferible la paralelización
 de grano fino (bucle más interno) o de grano grueso (bucle más externo)
 en otros algoritmos?
 
@@ -192,7 +192,7 @@ En base a estos resultados podemos concluir que en algoritmos similares
 a este es preferible la paralelización de grano grueso.
 
 
-####3.5 Descripción de la gráfica de tiempos para el calculo de la
+#### 3.5 Descripción de la gráfica de tiempos para el calculo de la
 multiplicacion en serie y en paralelo.
 
 
