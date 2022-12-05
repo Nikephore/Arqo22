@@ -1,6 +1,6 @@
 # Luis Miguel Nucifora & Bernardo Andrés Zambrano
 
-## Numero de pareja -> (2 mod 8) + 1 = 3
+## Numero de pareja -> (13 mod 8) + 1 = 6
 
 ### Ejercicio 0
 
@@ -23,8 +23,7 @@ se realicen en paralelo y no mediante una planificación por parte del SO
 que alterna en la ejecucion de cada uno.
 
 
-#### 1.2 ¿Cuántos threads debería utilizar en los ordenadores del laboratorio?
-¿y en el clúster? ¿y en su propio equipo?
+#### 1.2 ¿Cuántos threads debería utilizar en los ordenadores del laboratorio? ¿y en el clúster? ¿y en su propio equipo?
 
 El número que corresponda al mayor número de cores lógicos que se encuentren
 en alguno de los procesadores del cluster.
@@ -33,8 +32,7 @@ En mi equipo no hay hyperthreading, por lo que se deberán lanzar tantos hilos
 como cores físicos haya en la cpu, que serían 4 en este caso.
 
 
-#### 1.3 Modifique el programa omp1.c para utilizar las tres formas de elegir el
-número de threads y deduzca la prioridad entre ellas.
+#### 1.3 Modifique el programa omp1.c para utilizar las tres formas de elegir el número de threads y deduzca la prioridad entre ellas.
 
 Tras realizar las distintas pruebas con el archivo omp1.c hemos llegado a la
 conclusión que la prioridad de mayor a menor es: 
@@ -74,8 +72,7 @@ modificaciones estas no se reflejan en la variable del thread master.
 Cada thread tiene una dirección de memoria distinta para esta variable.
 
 
-#### 1.5 ¿Qué ocurre con el valor de una variable privada al comenzar a ejecutarse
-la región paralela?
+#### 1.5 ¿Qué ocurre con el valor de una variable privada al comenzar a ejecutarse la región paralela?
 
 Si se trata de una variable definida como firstprivate, su valor comienza
 siendo el mismo que su valor en la región no paralela. Si por el contrario
@@ -100,22 +97,20 @@ en la región no paralela.
 ### Ejercicio 2
 
 
-#### 2.1 Ejecute la versión serie y entienda cual debe ser el resultado
-para diferentes tamaños de vector.
+#### 2.1 Ejecute la versión serie y entienda cual debe ser el resultado para diferentes tamaños de vector.
 
 El programa calcula el producto escalar de dos vectores, por lo que
 el resultado del mismo siempre será el tamaño de los vectores.
 
 
-#### 2.2 Ejecute el código paralelizado con el pragma openmp y conteste en
-la memoria a las siguientes preguntas:
+#### 2.2 Ejecute el código paralelizado con el pragma openmp y conteste en la memoria a las siguientes preguntas:
 
-- ¿Es correcto el resultado?
+##### - ¿Es correcto el resultado?
 
 No, el resultado debería ser igual al de la ejecucion del programa
 en serie.
 
-- ¿Qué puede estar pasando?
+##### - ¿Qué puede estar pasando?
 
 La variable sum se establece como shared por defecto en openmp. Esto
 causa que todos los hilos lean y escriban de la misma variable, por lo
@@ -126,15 +121,14 @@ variable.
 #### 2.3 Modifique el código anterior y denomine el programa pescalar_par2:
 
 
-- ¿Puede resolverse con ambas directivas? Indique las modificaciones
-realizadas en cada caso.
+##### - ¿Puede resolverse con ambas directivas? Indique las modificaciones realizadas en cada caso.
 
 Si, en el caso de la directiva atomic debemos reescribir la sentencia de
 sum=sum+A[k]*B[k] a sum+=A[k]*B[k]. Para la directiva critical únicamente
 hay que meter el código entre {}.
 
 
-- ¿Cuál es la opción elegida y por qué?
+##### - ¿Cuál es la opción elegida y por qué?
 
 La opción elegida es atomic ya que se trata de una única sentencia RMW
 sencilla y tras hacer algunas pruebas se ha observado que es más rápida.
@@ -143,7 +137,7 @@ sencilla y tras hacer algunas pruebas se ha observado que es más rápida.
 #### 2.4 Modifique el código anterior y denomine el programa resultante pescalar_par3.
 
 
-- Comparando con el punto anterior ¿Cuál será la opción elegida y por qué?
+##### - Comparando con el punto anterior ¿Cuál será la opción elegida y por qué?
 
 La opción elegida será el pragma reduction porque llegamos a un
 resultado correcto y el tiempo de ejecución muestra diferencias bastante
@@ -170,8 +164,7 @@ paralela-bucle3		63.45		32.57		21.18		16.68
 El bucle 1 es el mas interno y el 3 el mas externo
 
 
-#### 3.1 ¿Cuál de las tres versiones obtiene peor rendimiento? ¿A qué se debe?
-¿Cuál de las tres versiones obtiene mejor rendimiento? ¿A qué se debe?
+#### 3.1 ¿Cuál de las tres versiones obtiene peor rendimiento? ¿A qué se debe? ¿Cuál de las tres versiones obtiene mejor rendimiento? ¿A qué se debe?
 
 
 El programa con peor rendimiento es el que tiene el bucle mas externo
@@ -183,17 +176,14 @@ bucle mas interno paralelizado. Su rendimiento se puede deber a que
 hace uso de los recursos estrictamente necesarios.
 
 
-#### 3.2 En base a los resultados, ¿cree que es preferible la paralelización
-de grano fino (bucle más interno) o de grano grueso (bucle más externo)
-en otros algoritmos?
+#### 3.2 En base a los resultados, ¿cree que es preferible la paralelización de grano fino (bucle más interno) o de grano grueso (bucle más externo) en otros algoritmos?
 
 
 En base a estos resultados podemos concluir que en algoritmos similares
 a este es preferible la paralelización de grano grueso.
 
 
-#### 3.5 Descripción de la gráfica de tiempos para el calculo de la
-multiplicacion en serie y en paralelo.
+#### 3.3 Descripción de la gráfica de tiempos para el calculo de la multiplicacion en serie y en paralelo.
 
 
 Realizamos la grafica entre los valores 512+P = 515 y 1024+512+P = 1577
