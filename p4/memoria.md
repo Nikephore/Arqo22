@@ -39,9 +39,9 @@ conclusión que la prioridad de mayor a menor es:
 
 cláusula -> función -> variable de entorno
 
-----------------------------------------------------------------------
+
 Salida de la ejecucion de omp2
-----------------------------------------------------------------------
+
 shadeeon@Shadeeon:~/Universidad/arqo/p4$ ./omp2
 
 Inicio: a = 1,	 b = 2,	 c = 3
@@ -75,7 +75,6 @@ Inicio: a = 1,	 b = 2,	 c = 3
 Fin: a = 1,	 b = 10,	 c = 3
 
    &a = 0x7fffb473d594,	 &b = 0x7fffb473d598,	 &c = 0x7fffb473d59c
------------------------------------------------------------------------
 
 
 #### 1.4 ¿Como se comporta OpenMP cuando declaramos una variable privada?
