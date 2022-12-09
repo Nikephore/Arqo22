@@ -160,20 +160,20 @@ notables, siendo mucho más rápido que las opciones anteriores.
 ### Ejercicio 3
 
 
-Para una matriz de 1000x1000 el programa normal_serie.c tarda 8.74s
+Para una matriz de 1000x1000 el programa normal_serie.c tarda 7.81s
 Para alcanzar una medicion de aproximadamente 1 minuto necesitamos
 ejecutar el programa con una matrizde 1750x1750
 
 Para rellenar la tabla lo haremos ejecutando los programas sobre una
-matriz de 1750x1750
+matriz de 1900x1900
 
 
 | version\# hilo	|	1	|	2	|	3	|	4 |
 |-----------------------|---------------|---------------|---------------|---------|
-| serie			| 66.64		|		|		|	  |
-| paralela-bucle1	| 66.45		| 33.49		| 23.31		| 17.70   |
-| paralela-bucle2	| 66.12		| 35.32		| 21.92		| 17.69   |
-| paralela-bucle3	| 63.45		| 32.57		| 21.18		| 16.68   |
+| serie			| 78.06		|		|		|	  |
+| paralela-bucle1	| 61.82	| 33.37		| 24.17		| 20.00   |
+| paralela-bucle2	| 78.52	| 39.40		| 26.89		| 20.71   |
+| paralela-bucle3	| 81.47	| 39.40		| 26.72		| 20.36   |
 
 El bucle 1 es el mas interno y el 3 el mas externo
 
@@ -194,7 +194,7 @@ hace uso de los recursos estrictamente necesarios.
 
 
 En base a estos resultados podemos concluir que en algoritmos similares
-a este es preferible la paralelización de grano grueso.
+a este es preferible la paralelización de grano fino.
 
 
 #### 3.3 Descripción de la gráfica de tiempos para el calculo de la multiplicacion en serie y en paralelo.
