@@ -200,7 +200,7 @@ a este es preferible la paralelización de grano fino.
 #### 3.3 Descripción de la gráfica de tiempos para el calculo de la multiplicacion en serie y en paralelo.
 
 
-Realizamos la grafica entre los valores 512+P = 515 y 1024+512+P = 1577
+Realizamos la grafica entre los valores 512+P = 518 y 1024+512+P = 1580
 con incrementos de 64 unidades. Los archivos referentes a esta parte del
 ejercicio se encuentran en la carpeta "ejercicio3"
 
