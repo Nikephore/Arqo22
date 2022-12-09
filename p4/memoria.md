@@ -162,7 +162,7 @@ notables, siendo mucho más rápido que las opciones anteriores.
 
 Para una matriz de 1000x1000 el programa normal_serie.c tarda 7.81s
 Para alcanzar una medicion de aproximadamente 1 minuto necesitamos
-ejecutar el programa con una matrizde 1750x1750
+ejecutar el programa con una matrizde 1900x1900
 
 Para rellenar la tabla lo haremos ejecutando los programas sobre una
 matriz de 1900x1900
